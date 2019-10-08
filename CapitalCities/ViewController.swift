@@ -9,20 +9,47 @@
 import UIKit
 import MapKit
 
+
 class ViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet var mapView: MKMapView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         
-        let london = Capital(title: "London", coordinate: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), info: "Home to the 2012 Summer Olympics")
-        let oslo = Capital(title: "Oslo", coordinate: CLLocationCoordinate2D(latitude: 59.95, longitude: 10.75), info: "Founded over a thousand years ago.")
-        let paris = Capital(title: "Paris", coordinate: CLLocationCoordinate2D(latitude: 48.8567, longitude: 2.3508), info: "Often called the City of Light.")
-        let rome = Capital(title: "Rome", coordinate: CLLocationCoordinate2D(latitude: 41.9, longitude: 12.5), info: "Has a whole country inside it.")
-        let washington = Capital(title: "Washington D.C.", coordinate: CLLocationCoordinate2D(latitude: 38.895111, longitude: -77.036667), info: "Named after George himself.")
+        let london = Capital(title: "London", coordinate: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), info: "Home to the 2012 Summer Olympics", url: "https://en.wikipedia.org/wiki/London")
+        let oslo = Capital(title: "Oslo", coordinate: CLLocationCoordinate2D(latitude: 59.95, longitude: 10.75), info: "Founded over a thousand years ago.", url: "https://en.wikipedia.org/wiki/Oslo")
+        let paris = Capital(title: "Paris", coordinate: CLLocationCoordinate2D(latitude: 48.8567, longitude: 2.3508), info: "Often called the City of Light.", url: "https://en.wikipedia.org/wiki/Paris")
+        let rome = Capital(title: "Rome", coordinate: CLLocationCoordinate2D(latitude: 41.9, longitude: 12.5), info: "Has a whole country inside it.", url: "https://en.wikipedia.org/wiki/Rome")
+        let washington = Capital(title: "Washington D.C.", coordinate: CLLocationCoordinate2D(latitude: 38.895111, longitude: -77.036667), info: "Named after George himself.", url: "https://en.wikipedia.org/wiki/Washington,_D.C.")
+        let bucharest = Capital(title: "Bucharest", coordinate: CLLocationCoordinate2D(latitude: 44.4325, longitude: 26.103889), info: "Little Paris", url: "https://en.wikipedia.org/wiki/Bucharest")
         
-        mapView.addAnnotations([london, oslo, paris, rome, washington])
+        mapView.addAnnotations([london, oslo, paris, rome, washington, bucharest])
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Layer", style: .plain, target: self, action: #selector(selectLayer))
+    }
+    
+    @objc func selectLayer() {
+        
+        let ac = UIAlertController(title: "Select Map Layer", message: nil, preferredStyle: .actionSheet)
+        ac.addAction(UIAlertAction(title: "Standard", style: .default, handler: { (_) in
+            self.mapView.mapType = .standard
+        }))
+        ac.addAction(UIAlertAction(title: "Satellite", style: .default, handler: { (_) in
+            self.mapView.mapType = .satellite
+        }))
+        ac.addAction(UIAlertAction(title: "Hybrid", style: .default, handler: { (_) in
+            self.mapView.mapType = .hybrid
+        }))
+        ac.addAction(UIAlertAction(title: "Muted Standard", style: .default, handler: { (_) in
+            self.mapView.mapType = .mutedStandard
+        }))
+        ac.addAction(UIAlertAction(title: "Satellite Flyover", style: .default, handler: { (_) in
+            self.mapView.mapType = .satelliteFlyover
+        }))
+        present(ac, animated: true)
+        
     }
     
     // Simillarly to the pattern of re-using table view cells.
@@ -33,19 +60,19 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
         let identifier = "Capital"
         
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-        
-        if annotationView == nil {
-            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-            annotationView?.canShowCallout = true
+        if let reusedAnnotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKPinAnnotationView {
+            reusedAnnotationView.annotation = annotation
+            return reusedAnnotationView
+        } else {
+            let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView.canShowCallout = true
+            annotationView.pinTintColor = .systemBlue
             
             let btn = UIButton(type: .detailDisclosure)
-            annotationView?.rightCalloutAccessoryView = btn
-        } else {
-            annotationView?.annotation = annotation
+            annotationView.rightCalloutAccessoryView = btn
+            return annotationView
         }
         
-        return annotationView
     }
     
     // Called when the button (rightCalloutAccesory) on the annotation view is tapped
@@ -54,10 +81,15 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
         let placeName = capital.title
         let placeInfo = capital.info
+        let placeURL = capital.url
         
-        let ac = UIAlertController(title: placeName, message: placeInfo, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(ac, animated: true)
+//        let ac = UIAlertController(title: placeName, message: placeInfo, preferredStyle: .alert)
+//        ac.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+//        present(ac, animated: true)
+        
+        let webView = WebViewController()
+        webView.url = placeURL
+        present(webView, animated: true)
     }
 
 }
