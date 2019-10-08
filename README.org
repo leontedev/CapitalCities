@@ -1,0 +1,15 @@
+* Capital Cities
+*Show the capital cities on a Map*
+
+[[gif.gif]]
+
+*Project 16 - Days 60-61 - [[www.HackingWithSwift.com/100/60]]
+
+** Day 60
+*** Introduction to MapKit
+ - Added a Map Kit View in the storyboard, and added an outlet to the VC
+ - Added a Model file - Capital which inherits from NSObject and conforms to the MKAnnotation protocol (each "annotation" is a POI on the map). The class has to have a coordinate property of type CLLocationCoordinate2D
+ - Hardcoded a few capitals in viewDidLoad
+ - Implemented mapView(viewFor annotation:) - which uses a similar pattern to the cell reusing in a Table View. Try to dequeue an annotation view, if it's nil (and it will be for the first one) create an instance.
+ - Added a button to the .rightCalloutAccessoryView property on the annotationView. When tapped - it will call mapView(calloutAccessoryControlTapped:). Which we implemented to display an alert.
+** Day 61
